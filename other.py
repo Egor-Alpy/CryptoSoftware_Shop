@@ -1,3 +1,6 @@
+from data.TEXT import *
+
+
 # Проверка: является ли сообщение числом
 def is_number(msg):
     try:
@@ -5,3 +8,8 @@ def is_number(msg):
         return True
     except:
         return False
+
+
+
+
+

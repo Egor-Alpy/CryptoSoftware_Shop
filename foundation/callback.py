@@ -1,19 +1,19 @@
-from create_bot import *
+from bot_creation import *
 from aiogram import types
 import keyboards as kb
 
 """#################################  # # # # # # # # # # # # # ######################################"""
 """########################### # # # #       CALL BACK       # # # # #################################"""
 """#################################  # # # # # # # # # # # # # ######################################"""
-
+'''
 
 # @dp.callback_query_handler()
 async def callback_func(callback: types.CallbackQuery):
-    if callback.data == 'Софты':
-        await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text='*Выберите софт, чтобы узнать более подробную информацию о нем!*', parse_mode='markdown', reply_markup=kb.get_softs_inlinekeyboard())
-    elif callback.data == 'Купить':
+    # if callback.data == 'Софты':
+        # await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text='*Выберите софт, чтобы узнать более подробную информацию о нем!*', parse_mode='markdown', reply_markup=kb.get_softs_inlinekeyboard())
+    if callback.data == 'Купить':
         await callback.answer('⚠️  ОПЛАТА ВРЕМЕННО НЕДОСТУПНА  ⚠️')
-    elif callback.data == "Назад":
+    elif callback.data == "Назад Меню":
         await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text='*Добро пожаловать, выберите, что вам нужно в меню ниже!*', parse_mode='markdown', reply_markup=kb.menu_markup)
     elif callback.data == "Назад Покупка":
         await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text='*Выберите софт, чтобы узнать более подробную информацию о нем!*', parse_mode='markdown', reply_markup=kb.get_softs_inlinekeyboard())
@@ -30,3 +30,4 @@ async def callback_func(callback: types.CallbackQuery):
 
 def register_handlers_callback(dp : Dispatcher):
     dp.register_callback_query_handler(callback_func)
+'''
