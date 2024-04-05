@@ -1,8 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
-import sqlite3 as sq
 from bot_creation import *
-from aiogram import types
 from data.database import *
+from StatesGroups import *
 
 
 cancel_markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -12,6 +11,41 @@ b1 = InlineKeyboardButton('Софты', callback_data='Софты')
 b2 = InlineKeyboardButton('Канал', url='https://t.me/AT_industries')
 menu_markup = InlineKeyboardMarkup()
 menu_markup.add(b1, b2)
+
+promocode_check_markup = InlineKeyboardMarkup()
+b1 = InlineKeyboardButton('Да', callback_data='do_have_a_promocode')
+b2 = InlineKeyboardButton('Нет', callback_data='do_not_have_a_promocode')
+b3 = InlineKeyboardButton('🔺 Назад в меню', callback_data='%Назад Софт')
+promocode_check_markup.add(b1, b2).add(b3)
+
+
+@dp.callback_query_handler(lambda call: call.data.startswith('do_have_a_promocode'))
+async def back_to_soft_consideration_button(callback: types.CallbackQuery, state: FSMContext):
+    await callback.answer('⚙️⚙️⚙️')
+    '''await PaymentStatesGroup.promocode2.set()
+    await bot.send_message(chat_id=callback.message.chat.id,
+                                text='*Введите промокод*',
+                                parse_mode='markdown', reply_markup=cancel_markup)
+'''
+
+
+@dp.callback_query_handler(lambda call: call.data.startswith('do_not_have_a_promocode'))
+async def back_to_soft_consideration_button(callback: types.CallbackQuery, state: FSMContext):
+    await callback.answer('⚙️⚙️⚙️')
+    '''await PaymentStatesGroup.promocode2.set()
+    await bot.send_message(chat_id=callback.message.chat.id,
+                                text='*Введите промокод*',
+                                parse_mode='markdown', reply_markup=cancel_markup)
+'''
+
+
+@dp.callback_query_handler(lambda call: call.data.startswith('%Назад Софт'))
+async def back_to_soft_consideration_button(callback: types.CallbackQuery, state: FSMContext):
+    await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id,
+                                text='*Добро пожаловать, выберите, что вам нужно в меню ниже!*',
+                                parse_mode='markdown', reply_markup=menu_markup)
+
+
 @dp.callback_query_handler(lambda call: call.data.startswith('Софты'))
 async def soft_key_board(callback: types.CallbackQuery):
     await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id,
@@ -22,8 +56,11 @@ async def soft_key_board(callback: types.CallbackQuery):
 
 b1 = InlineKeyboardButton('Купить', callback_data='Купить')
 @dp.callback_query_handler(lambda call: call.data.startswith('Купить'))
-async def buy_callback(callback: types.CallbackQuery):
-    await callback.answer('⚠️  ОПЛАТА ВРЕМЕННО НЕДОСТУПНА  ⚠️')
+async def buy_callback(callback: types.CallbackQuery, state: FSMContext):
+    soft_name = (callback.message.text).split('\n')[0][10::]
+    async with state.proxy() as data:
+        data['soft_name'] = soft_name
+    await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text='У Вас есть промокод?', reply_markup=promocode_check_markup)
 
 b2 = InlineKeyboardButton('🔺 Назад', callback_data='Назад Покупка')
 @dp.callback_query_handler(lambda call: call.data.startswith('Назад Покупка'))

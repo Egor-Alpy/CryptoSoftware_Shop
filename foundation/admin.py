@@ -187,6 +187,23 @@ async def admin_help(message: types.Message):
         await message.reply(MSG['RUS']['STATES']['MISTAKE']['NO ROOTS'], parse_mode='markdown')
 
 
+"""#################################  # # # # # # # # # # # # # ######################################"""
+"""########################### # # # #         PAYMENT        # # # # ################################"""
+"""#################################  # # # # # # # # # # # # # ######################################"""
+
+# @dp.message_handler(lambda message: message.text, state=PaymentStatesGroup.promocode2)
+async def load_promo(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['promo'] = message.text
+    await PaymentStatesGroup.transaction_verification.set()
+    await message.reply('Отправьте хх usdt на указанный адрес: UQBSdLE61RD0P1gdmd-8_jQJotPPskkYpllE9EajbOyQyZXM и пришлите идентификатор транзации для подтверждения', parse_mode='markdown')
+
+async def load_transaction(message: types.Message, state: FSMContext):
+    await PaymentStatesGroup.github.set()
+    await message.reply('Отправьте свой гитхаб')
+
+
+
 def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(add_soft, commands=['addsoft'])
     dp.register_message_handler(load_softname, lambda message: message.text, state=ClientStatesGroup.name)
@@ -203,5 +220,6 @@ def register_handlers_admin(dp: Dispatcher):
     # dp.register_message_handler(refresh_func, commands=['refresh'])
     dp.register_message_handler(admin_help, commands=['admin_help'])
 
-
+    dp.register_message_handler(load_promo, lambda message: message.text, state=PaymentStatesGroup.promocode2)
+    dp.register_message_handler(load_transaction, lambda message: message.text, state=PaymentStatesGroup.transaction_verification)
 

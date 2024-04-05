@@ -19,6 +19,14 @@ class PartnerStatesGroup(StatesGroup):
     quantity = State()
 
 
+# Payment
+class PaymentStatesGroup(StatesGroup):
+    promocode1 = State()
+    promocode2 = State()
+    transaction_verification = State()
+    github = State()
+
+
 # =====================================      CANCEL      =================================================
 
 # @dp.message_handler(commands=['cancel'], state="*")

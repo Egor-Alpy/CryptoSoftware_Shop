@@ -27,8 +27,6 @@ async def startf(message: types.Message):
     data_base.adduser(user_id, name, message)
 
 
-
-
 # @dp.message_handler(commands=['menu'])
 async def menuf(message: types.Message):
     await message.answer(MSG['RUS']['ADMIN']['MSG_MENU'],
