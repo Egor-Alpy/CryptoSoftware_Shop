@@ -32,9 +32,24 @@ class DataBase():
                 discount INTEGER,
                 quantity INTEGER
                 )""")
+            cur.execute("""CREATE TABLE IF NOT EXISTS purchases (
+                            indexx INTEGER PRIMARY KEY AUTOINCREMENT,
+                            user_id INTEGER,
+                            username TEXT,
+                            user_github TEXT,
+                            soft_name TEXT,
+                            soft_price INTEGER,
+                            refer_id INTEGER,
+                            refer_discount INTEGER,
+                            promocode INTEGER,
+                            discount INTEGER,
+                            total_discount INTEGER,
+                            purchased INTEGER
+                            )""")
     def __init__(self):
         pass
-
+    def addpurchase(self, user_id, username, user_github, soft_name, soft_price, refer_id, refer_discount, promocode, discount, total_discount, purchased):
+        edit_database(f"INSERT INTO purchases ('user_id', 'username', 'user_github', 'soft_name', 'soft_price', 'refer_id', 'refer_discount', 'promocode', 'discount', 'total_discount', 'purchased') VALUES ('{user_id}', '{username}', '{user_github}', '{soft_name}', '{soft_price}', '{refer_id}', '{refer_discount}', '{promocode}', '{discount}', '{total_discount}', '{purchased}')")
     def adduser(self, user_id, name, message):
         edit_database(f"INSERT INTO users('user_id', 'name', 'refer_id') VALUES({user_id}, '{name}', '{message.text[7::]}')")
 

@@ -2,28 +2,13 @@ from bot_creation import *
 import keyboards as kb
 from StatesGroups import *
 from config import admin_id
-from other import is_number
+from other import is_number, cmd_state_cancel
 from data.TEXT import *
+
 # ##################################################################################################### #
 # ############################################# ADMIN ################################################# #
 # ##################################################################################################### #
 
-# Остановка машины состояния при вызове новой команды и вызов этой команды
-async def cmd_state_cancel_admin(message, state):
-    msg = message.text
-    if msg in CMDS_ADMIN:
-        await state.finish()
-
-        if msg == CMD_DEL_SOFT:
-            await delete_soft(message)
-        if msg == CMD_ADD_SOFT:
-            await add_soft(message)
-        if msg == CMD_DEL_PARTNER:
-            await delete_partner(message)
-        if msg == CMD_ADD_PARTNER:
-            await add_partner(message)
-        return True
-    return False
 
 """#################################  # # # # # # # # # # # # # ######################################"""
 """############################## # # # #       SOFT       # # # # ###################################"""
@@ -44,7 +29,7 @@ async def add_soft(message: types.Message):
 
 # @dp.message_handler(lambda message: message.text, state=ClientStatesGroup.name)
 async def load_softname(message: types.Message, state: FSMContext):
-    if await cmd_state_cancel_admin(message, state):
+    if await cmd_state_cancel(message, state):
         return
     async with state.proxy() as data:
         data['name'] = message.text
@@ -54,7 +39,7 @@ async def load_softname(message: types.Message, state: FSMContext):
 
 # @dp.message_handler(state=ClientStatesGroup.desc)
 async def load_desc(message: types.Message, state: FSMContext):
-    if await cmd_state_cancel_admin(message, state):
+    if await cmd_state_cancel(message, state):
         return
     async with state.proxy() as data:
         data['desc'] = message.text
@@ -64,7 +49,7 @@ async def load_desc(message: types.Message, state: FSMContext):
 
 # @dp.message_handler(state=ClientStatesGroup.price)
 async def load_price(message: types.Message, state: FSMContext):
-    if await cmd_state_cancel_admin(message, state):
+    if await cmd_state_cancel(message, state):
         return
     if is_number(message.text):
         async with state.proxy() as data:
@@ -104,7 +89,7 @@ async def add_partner(message: types.Message):
 
 # @dp.message_handler(lambda message: message.text, state=PartnerStatesGroup.user_id)
 async def load_userid(message: types.Message, state: FSMContext):
-    if await cmd_state_cancel_admin(message, state):
+    if await cmd_state_cancel(message, state):
         return
     if is_number(message.text):
         async with state.proxy() as data:
@@ -116,7 +101,7 @@ async def load_userid(message: types.Message, state: FSMContext):
 
 # @dp.message_handler(lambda message: message.text, state=PartnerStatesGroup.name)
 async def load_partnername(message: types.Message, state: FSMContext):
-    if await cmd_state_cancel_admin(message, state):
+    if await cmd_state_cancel(message, state):
         return
     async with state.proxy() as data:
         data['name'] = message.text
@@ -126,7 +111,7 @@ async def load_partnername(message: types.Message, state: FSMContext):
 
 # @dp.message_handler(lambda message: message.text, state=PartnerStatesGroup.promocode)
 async def load_promo(message: types.Message, state: FSMContext):
-    if await cmd_state_cancel_admin(message, state):
+    if await cmd_state_cancel(message, state):
         return
     async with state.proxy() as data:
         data['promocode'] = message.text
@@ -136,7 +121,7 @@ async def load_promo(message: types.Message, state: FSMContext):
 
 # @dp.message_handler(lambda message: message.text, state=PartnerStatesGroup.discount)
 async def load_discount(message: types.Message, state: FSMContext):
-    if await cmd_state_cancel_admin(message, state):
+    if await cmd_state_cancel(message, state):
         return
     if is_number(message.text):
         async with state.proxy() as data:
@@ -149,7 +134,7 @@ async def load_discount(message: types.Message, state: FSMContext):
 
 # @dp.message_handler(lambda message: message.text, state=PartnerStatesGroup.quantity)
 async def load_quantity(message: types.Message, state: FSMContext):
-    if await cmd_state_cancel_admin(message, state):
+    if await cmd_state_cancel(message, state):
         return
     if is_number(message.text):
         async with state.proxy() as data:

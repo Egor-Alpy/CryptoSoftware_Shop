@@ -1,7 +1,10 @@
+import types
+
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from bot_creation import *
 from data.database import *
 from StatesGroups import *
+from data.database import *
 
 
 cancel_markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -13,21 +16,41 @@ menu_markup = InlineKeyboardMarkup()
 menu_markup.add(b1, b2)
 
 promocode_check_markup = InlineKeyboardMarkup()
-b1 = InlineKeyboardButton('Да', callback_data='do_have_a_promocode')
-b2 = InlineKeyboardButton('Нет', callback_data='do_not_have_a_promocode')
-b3 = InlineKeyboardButton('🔺 Назад в меню', callback_data='%Назад Софт')
-promocode_check_markup.add(b1, b2).add(b3)
+b1 = InlineKeyboardButton('Пропустить', callback_data='skip_promocode')
+b2 = InlineKeyboardButton('🔺 Отменить покупку', callback_data='%Назад Софт')
+promocode_check_markup.add(b1).add(b2)
+
+cancel_purchase_markup = InlineKeyboardMarkup()
+b1 = InlineKeyboardButton('🔺 Отменить покупку', callback_data='cancel_purchase_callback')
+cancel_purchase_markup.add(b1)
+
+@dp.callback_query_handler(lambda call: call.data.startswith('cancel_purchase_callback'))
+async def cancel_purchase(callback: types.CallbackQuery):
+    pass
 
 
-@dp.callback_query_handler(lambda call: call.data.startswith('do_have_a_promocode'))
-async def back_to_soft_consideration_button(callback: types.CallbackQuery, state: FSMContext):
-    await callback.answer('⚙️⚙️⚙️')
-    '''await PaymentStatesGroup.promocode2.set()
+@dp.callback_query_handler(lambda call: call.data.startswith('skip_promocode'))
+async def skip_promocode(callback: types.CallbackQuery, state: FSMContext):
+    price = '7777'
+    await callback.answer('')
+    await PaymentStatesGroup.transaction_verification.set()
     await bot.send_message(chat_id=callback.message.chat.id,
-                                text='*Введите промокод*',
-                                parse_mode='markdown', reply_markup=cancel_markup)
-'''
+                                text=f'Переведите {price} USDT по адресу: ХХХХХХХХХХХХХХХХХХХХХХ и отправьте идентификатор транзакции',
+                                parse_mode='markdown', reply_markup=cancel_purchase_markup)
 
+@dp.message_handler(state=PaymentStatesGroup.transaction_verification)
+async def transaction_verification(message: types.Message, state: FSMContext):
+    if message.text == message.text:
+        await message.answer('Транзакция подтверждена, пришлите ссылку на свой гитхаб', reply_markup=cancel_purchase_markup)
+    await PaymentStatesGroup.github.set()
+
+@dp.message_handler(state=PaymentStatesGroup.github)
+async def github(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['github'] = message.text
+    await message.answer(f"Покупка софта: <u><b>{data['soft_name']}</b></u> за <u><b>{data['soft_price']} USDT</b></u> успешно совершена. Доступ к проекту будет открыт в течении 4х часов", parse_mode='html')
+    DataBase.addpurchase(user_id=message.from_user.id, username=message.from_user.first_name+' '+message.from_user.last_name, user_github=['github'], soft_name=['soft_name'], soft_price=['soft_price'], refer_id='REFERIDIDIDIDIDI', refer_discount=989898, promocode='promo', discount=8888, total_discount=5555, purchased=11111)
+    await state.finish()
 
 @dp.callback_query_handler(lambda call: call.data.startswith('do_not_have_a_promocode'))
 async def back_to_soft_consideration_button(callback: types.CallbackQuery, state: FSMContext):
@@ -41,6 +64,7 @@ async def back_to_soft_consideration_button(callback: types.CallbackQuery, state
 
 @dp.callback_query_handler(lambda call: call.data.startswith('%Назад Софт'))
 async def back_to_soft_consideration_button(callback: types.CallbackQuery, state: FSMContext):
+    await state.finish()
     await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id,
                                 text='*Добро пожаловать, выберите, что вам нужно в меню ниже!*',
                                 parse_mode='markdown', reply_markup=menu_markup)
@@ -58,9 +82,11 @@ b1 = InlineKeyboardButton('Купить', callback_data='Купить')
 @dp.callback_query_handler(lambda call: call.data.startswith('Купить'))
 async def buy_callback(callback: types.CallbackQuery, state: FSMContext):
     soft_name = (callback.message.text).split('\n')[0][10::]
+    soft_price = (callback.message.text).split('\n')[4].split()[1]
     async with state.proxy() as data:
         data['soft_name'] = soft_name
-    await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text='У Вас есть промокод?', reply_markup=promocode_check_markup)
+        data['soft_price'] = soft_price
+    await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text='Введите промокод или нажмите "пропустить"', reply_markup=promocode_check_markup)
 
 b2 = InlineKeyboardButton('🔺 Назад', callback_data='Назад Покупка')
 @dp.callback_query_handler(lambda call: call.data.startswith('Назад Покупка'))
