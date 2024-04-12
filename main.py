@@ -1,17 +1,19 @@
-# ========================================    IMPORT    ===============================================
-from aiogram import Bot, types, executor, Dispatcher
+# ================================================================
+# MAIN ----- MAIN ----- MAIN ----- MAIN ----- MAIN ----- MAIN ----
+# ================================================================
 
-import StatesGroups
+# IMPORT ----- IMPORT ----- IMPORT ----- IMPORT ----- IMPORT -----
+
 from bot_creation import *
-from foundation import *
+from aiogram import executor
 
+from foundation.unifier import *
+
+
+# ON_STARTUP ----- ON_STARTUP ----- ON_STARTUP ----- ON_STARTUP ---
 async def on_startup(_):
-    print('_____Bot is running_____')
+    print('==================\n [BOT IS RUNNING]\n==================')
 
-StatesGroups.register_handlers_cancel_state(dp)
-# callback.register_handlers_callback(dp)
-admin.register_handlers_admin(dp)
-client.register_handlers_client(dp)
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)

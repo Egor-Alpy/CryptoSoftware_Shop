@@ -1,22 +1,23 @@
-# ========================================    IMPORT    ===============================================
-from aiogram import Bot, Dispatcher
+# ======================================================================================================================
+# BOT CREATION ----- BOT CREATION ----- BOT CREATION ----- BOT CREATION ----- BOT CREATION ----- BOT CREATION ----- BOT
+# ======================================================================================================================
 
-from config import token
+# IMPORT ----- IMPORT ----- IMPORT ----- IMPORT ----- IMPORT ----- IMPORT ----- IMPORT ----- IMPORT ----- IMPORT ----- I
+from data_project.config import TOKEN
+from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
-from data import database as db
+import data_project.data_base as db
 
 
-# Экземпляр класса БД
+# Создание экземпляра Базы Данных
 data_base = db.DataBase()
-
-# Создание Базы Данных
-data_base.CREATE_DATABASE()
 
 # Временное хранилище
 storage = MemoryStorage()
 
-# инициализация бота
-bot = Bot(token)
-dp = Dispatcher(bot=bot,
-                storage=storage)
+# Инициализация бота
+bot = Bot(TOKEN)
+dp = Dispatcher(bot=bot, storage=storage)
+
+

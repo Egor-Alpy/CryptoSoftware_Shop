@@ -1,46 +1,55 @@
+# IMPORT ----- IMPORT ----- IMPORT ----- IMPORT ----- IMPORT ----- IMPORT ----- IMPORT ----- IMPORT ----- IMPORT ----- I
 from aiogram import types
 from bot_creation import *
-import keyboards as kb
-from data.TEXT import *
-async def cmd_state_cancel(message, state):
-    msg = message.text
-    if msg in CMDS_CLIENT:
-        await state.finish()
-        if msg == CMD_START:
-            startf(message)
-        if msg == CMD_MENU:
-            menuf(message)
-        return True
-    return False
 
-"""#################################  # # # # # # # # # # # # # ######################################"""
-"""######################### # # # #       MAIN FUNCTIONS       # # # # ##############################"""
-"""#################################  # # # # # # # # # # # # # ######################################"""
+from foundation.keyboards import get_softs_inlinekeyboard
+from data_project.data_base import *
+from data_project.text import *
 
-# @dp.message_handler(commands=['start'])
-async def startf(message: types.Message):
-    await message.delete()
-    await message.answer(MSG['RUS']['ADMIN']['MSG_START'], parse_mode='markdown')
-    # добавляем\проверяем пользователя в БД
-    user_id = message.from_user.id
-    name = message.from_user.first_name
-    data_base.adduser(user_id, name, message)
+# ======================================================================================================================
+# MAIN FUNCTIONS ----- MAIN FUNCTIONS MAIN FUNCTIONS ----- MAIN FUNCTIONS MAIN FUNCTIONS ----- MAIN FUNCTIONS MAIN FUNCT
+# ======================================================================================================================
 
 
-# @dp.message_handler(commands=['menu'])
-async def menuf(message: types.Message):
-    await message.answer(MSG['RUS']['ADMIN']['MSG_MENU'],
-                         parse_mode='markdown',
-                         reply_markup=kb.menu_markup)
+# START ----- START ----- START ----- START ----- START ----- START ----- START ----- START ----- START ----- START ----
+@dp.message_handler(commands=['start'])
+async def start_func(message: types.Message):
+    await message.answer(MSG['RUS']['START'], parse_mode='markdown')
 
 
-# @dp.message_handler()
+# MENU ----- MENU ----- MENU ----- MENU ----- MENU ----- MENU ----- MENU ----- MENU ----- MENU ----- MENU ----- MENU ---
+@dp.message_handler(commands=['menu'])
+async def menu_func(message: types.Message):
+    # LANG = get_lang()
+    await get_menu(user_id=message.from_user.id)
 
-async def main_function(message: types.Message):
-    await message.reply(MSG['RUS']['STATES']['OTHERWISE'])
+
+async def get_menu(message_id=None, user_id=None, LANG='rus'):
+    menu_markup = InlineKeyboardMarkup()
+    b1 = InlineKeyboardButton('Софты', callback_data='soft_menu')
+    b2 = InlineKeyboardButton('Канал', url='https://t.me/AT_industries')
+    menu_markup.add(b1, b2)
+    if message_id is None:
+        await bot.send_message(chat_id=user_id, text=MSG['RUS']['MENU'], reply_markup=menu_markup,
+                               parse_mode='markdown')
+    else:
+        await bot.edit_message_text(
+            chat_id=user_id, message_id=message_id, text=MSG['RUS']['MENU'],
+            reply_markup=menu_markup, parse_mode='markdown'
+        )
 
 
-def register_handlers_client(dp: Dispatcher):
-    dp.register_message_handler(startf, commands=['start'])
-    dp.register_message_handler(menuf, commands=['menu'])
-    dp.register_message_handler(main_function)
+# SOFT MENU ----- SOFT MENU ----- SOFT MENU ----- SOFT MENU ----- SOFT MENU ----- SOFT MENU ----- SOFT MENU ----- SOFT M
+@dp.callback_query_handler(lambda call: call.data.startswith('soft_menu'))
+async def menu_soft_func(callback: types.CallbackQuery):
+    await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id,
+                                text=MSG['RUS']['MENU'],
+                                reply_markup=get_softs_inlinekeyboard(), parse_mode='markdown')
+
+
+@dp.callback_query_handler(lambda call: call.data.startswith('menu_request'))
+async def menu_soft_func(callback: types.CallbackQuery):
+    await get_menu(message_id=callback.message.message_id, user_id=callback.message.chat.id)
+
+
+
